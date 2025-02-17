@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Acceptance Probability Calculator</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        input, button { padding: 8px; margin-top: 5px; margin-bottom: 10px; }
+        #results p { margin: 5px 0; }
+    </style>
+</head>
+<body>
+    <h1>School Acceptance Probability Calculator</h1>
+    <p>Enter your GPA:</p>
+    <input type="number" id="gpaInput" step="0.01" placeholder="Enter your GPA" style="width: 200px;">
+    <button onclick="calculateProbabilities()">Calculate</button>
+    <div id="results"></div>
+
+    <script>
+        const schoolsData = {
+            "Hatanpään lukio": { mean: 7.89, std: 0.12 },
+            "Tampereen teknillisen lukion yleislinja": { mean: 7.76, std: 0.13 },
+            "Sammon keskuslukion yleislinja": { mean: 8.33, std: 0.15 },
+            "Tammerkosken lukion yleislinja": { mean: 8.18, std: 0.14 },
+            "Tampereen klassillisen lukion yleislinja": { mean: 8.53, std: 0.16 },
+            "Tampereen lyseon lukion yleislinja": { mean: 8.63, std: 0.19 },
+            "Kalevan lukio": { mean: 8.42, std: 0.17 },
+            "Tampereen yhteiskoulun lukio": { mean: 8.35, std: 0.14 },
+            "Tampereen yliopiston normaalikoulun lukio": { mean: 8.47, std: 0.18 },
+            "Tampereen Steinerkoulun lukio": { mean: 7.34, std: 0.15 }
+        };
+
+        function calculateProbabilities() {
+            const gpa = parseFloat(document.getElementById('gpaInput').value);
+            const resultsContainer = document.getElementById('results');
+            resultsContainer.innerHTML = '';
+
+            if (isNaN(gpa)) {
+                resultsContainer.innerHTML = 'Please enter a valid GPA.';
+                return;
+            }
+
+            let resultsHtml = '';
+            Object.entries(schoolsData).forEach(([school, { mean, std }]) => {
+                const z = (gpa - mean) / std;
+                const probability = (0.5 * (1 + Math.erf(z / Math.sqrt(2)))).toFixed(4);
+                resultsHtml += `<p>${school}: ${probability}</p>`;
+            });
+            resultsContainer.innerHTML = resultsHtml;
+        }
+    </script>
+</body>
+</html>
