@@ -5,15 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>School Acceptance Probability Calculator</title>
     <style>
-        body { font-family: Arial, sans-serif; padding: 20px; }
-        input, button { padding: 8px; margin-top: 5px; margin-bottom: 10px; }
-        #results p { margin: 5px 0; }
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f4f4f4;
+            color: #333;
+        }
+        input, button {
+            padding: 10px;
+            width: 100%; /* Makes input and button responsive */
+            margin: 5px 0 20px 0;
+            box-sizing: border-box; /* Includes padding and border in width */
+        }
+        #results p {
+            margin: 5px 0;
+            padding: 5px;
+            background: white;
+            border-left: 5px solid #0078D7;
+        }
     </style>
 </head>
 <body>
     <h1>School Acceptance Probability Calculator</h1>
     <p>Enter your GPA:</p>
-    <input type="number" id="gpaInput" step="0.01" placeholder="Enter your GPA" style="width: 200px;">
+    <input type="number" id="gpaInput" step="0.01" placeholder="Enter your GPA">
     <button onclick="calculateProbabilities()">Calculate</button>
     <div id="results"></div>
 
@@ -34,20 +49,35 @@
         function calculateProbabilities() {
             const gpa = parseFloat(document.getElementById('gpaInput').value);
             const resultsContainer = document.getElementById('results');
-            resultsContainer.innerHTML = '';
+            resultsContainer.innerHTML = ''; // Clear previous results
 
             if (isNaN(gpa)) {
-                resultsContainer.innerHTML = 'Please enter a valid GPA.';
+                resultsContainer.innerHTML = '<p>Please enter a valid GPA.</p>';
                 return;
             }
 
             let resultsHtml = '';
             Object.entries(schoolsData).forEach(([school, { mean, std }]) => {
                 const z = (gpa - mean) / std;
-                const probability = (0.5 * (1 + Math.erf(z / Math.sqrt(2)))).toFixed(4);
+                const probability = (0.5 * (1 + erf(z / Math.sqrt(2)))).toFixed(4);
                 resultsHtml += `<p>${school}: ${probability}</p>`;
             });
             resultsContainer.innerHTML = resultsHtml;
+        }
+
+        // Polynomial approximation of the error function
+        function erf(x) {
+            const sign = Math.sign(x);
+            x = Math.abs(x);
+            const a1 =  0.254829592;
+            const a2 = -0.284496736;
+            const a3 =  1.421413741;
+            const a4 = -1.453152027;
+            const a5 =  1.061405429;
+            const p  =  0.3275911;
+            const t = 1.0 / (1.0 + p * x);
+            const y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
+            return sign * y;
         }
     </script>
 </body>
