@@ -33,58 +33,55 @@
     <div id="results"></div>
 
     <script>
-        const schoolsData = {
-            "Hatanpään lukio": { mean: 7.89, std: 0.12 },
-            "Tampereen teknillisen lukion yleislinja": { mean: 7.76, std: 0.13 },
-            "Sammon keskuslukion yleislinja": { mean: 8.33, std: 0.15 },
-            "Tammerkosken lukion yleislinja": { mean: 8.18, std: 0.14 },
-            "Tampereen klassillisen lukion yleislinja": { mean: 8.53, std: 0.16 },
-            "Tampereen lyseon lukion yleislinja": { mean: 8.63, std: 0.19 },
-            "Kalevan lukio": { mean: 8.42, std: 0.17 },
-            "Tampereen yhteiskoulun lukio": { mean: 8.35, std: 0.14 },
-            "Tampereen yliopiston normaalikoulun lukio": { mean: 8.47, std: 0.18 },
-            "Tampereen Steinerkoulun lukio": { mean: 7.34, std: 0.15 }
-        };
+    const schoolsData = {
+        "Hatanpään lukio": { mean: 7.89, std: 0.12 },
+        "Tampereen teknillisen lukion yleislinja": { mean: 7.76, std: 0.13 },
+        "Sammon keskuslukion yleislinja": { mean: 8.33, std: 0.15 },
+        "Tammerkosken lukion yleislinja": { mean: 8.18, std: 0.14 },
+        "Tampereen klassillisen lukion yleislinja": { mean: 8.53, std: 0.16 },
+        "Tampereen lyseon lukion yleislinja": { mean: 8.63, std: 0.19 },
+        "Kalevan lukio": { mean: 8.42, std: 0.17 },
+        "Tampereen yhteiskoulun lukio": { mean: 8.35, std: 0.14 },
+        "Tampereen yliopiston normaalikoulun lukio": { mean: 8.47, std: 0.18 },
+        "Tampereen Steinerkoulun lukio": { mean: 7.34, std: 0.15 }
+    };
 
-        function calculateProbabilities() {
-            const gpa = parseFloat(document.getElementById('gpaInput').value);
-            const resultsContainer = document.getElementById('results');
-            resultsContainer.innerHTML = ''; // Clear previous results
+    function calculateProbabilities() {
+        const gpa = parseFloat(document.getElementById('gpaInput').value);
+        const resultsContainer = document.getElementById('results');
+        resultsContainer.innerHTML = ''; // Clear previous results
 
-            if (isNaN(gpa)) {
-                resultsContainer.innerHTML = '<p>Please enter a valid GPA.</p>';
-                return;
-            }
-
-            let resultsHtml = '';
-            Object.entries(schoolsData).forEach(([school, { mean, std }]) => {
-                const z = (gpa - mean) / std;
-                const probability = (0.5 * (1 + erf(z / Math.sqrt(2))) * 100).toFixed(2); // Convert to percentage
-                resultsHtml += `<p>${school}: ${probability}%</p>`; // Append '%' to the number
-            });
-            resultsContainer.innerHTML = resultsHtml;
+        if (isNaN(gpa)) {
+            resultsContainer.innerHTML = '<p>Please enter a valid GPA.</p>';
+            return;
         }
 
-        // Polynomial approximation of the error function
-        function erf(x) {
-            // constants
-            const a1 =  0.254829592;
-            const a2 = -0.284496736;
-            const a3 =  1.421413741;
-            const a4 = -1.453152027;
-            const a5 =  1.061405429;
-            const p  =  0.3275911;
+        let resultsHtml = '';
+        Object.entries(schoolsData).forEach(([school, { mean, std }]) => {
+            const z = (gpa - mean) / std;
+            const probability = (0.5 * (1 + erf(z / Math.sqrt(2)))) * 100; // Correct multiplication by 100
+            resultsHtml += `<p>${school}: ${probability.toFixed(2)}%</p>`; // Format to 2 decimal places and add '%'
+        });
+        resultsContainer.innerHTML = resultsHtml;
+    }
 
-            // Save the sign of x
-            const sign = x >= 0 ? 1 : -1;
-            x = Math.abs(x);
+    // Polynomial approximation of the error function
+    function erf(x) {
+        const sign = x >= 0 ? 1 : -1;
+        x = Math.abs(x);
+        const a1 =  0.254829592;
+        const a2 = -0.284496736;
+        const a3 =  1.421413741;
+        const a4 = -1.453152027;
+        const a5 =  1.061405429;
+        const p  =  0.3275911;
 
-            // A&S formula 7.1.26
-            const t = 1.0 / (1.0 + p*x);
-            const y = 1.0 - (((((a5*t + a4)*t) + a3)*t + a2)*t + a1)*t * Math.exp(-x*x);
+        const t = 1.0 / (1.0 + p * x);
+        const y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
+        return sign * y;
+    }
+</script>
 
-            return sign * y;
-        }
-    </script>
+   
 </body>
 </html>
